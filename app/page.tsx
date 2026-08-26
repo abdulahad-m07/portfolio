@@ -26,14 +26,12 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm"
+      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm w-32 h-32 md:w-40 md:h-40"
       style={{
         fontFamily: "Inter, sans-serif",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
         transition: `all 0.5s ${ease} ${0.6 + index * 0.08}s`,
-        width: "100%",
-        paddingBottom: "100%",
         background: "rgba(255,255,255,0.05)",
         border: "1px solid rgba(255,255,255,0.1)",
       }}
@@ -44,7 +42,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         <img
           src={logoSrc}
           alt={`${skill} logo`}
-          className="absolute inset-0 w-full h-full object-contain p-2 rounded-xl"
+          className="absolute inset-0 w-full h-full object-contain p-3 rounded-xl"
           style={{
             opacity: hovered ? 1 : 0,
             transition: "opacity 0.3s ease",
@@ -331,7 +329,7 @@ export default function Home() {
             Skills
           </h2>
           <div
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl"
+            className="grid grid-cols-3 md:grid-cols-3 gap-4 w-full max-w-lg"
             style={{
               opacity: skillsVisible ? 1 : 0,
               transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.9)",
