@@ -63,6 +63,7 @@ export default function Home() {
   const [aboutVisible, setAboutVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const terminalRef = useRef<InteractiveTerminalHandle>(null);
+  const whooshRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 100);
@@ -76,12 +77,19 @@ export default function Home() {
     });
   }, [stage]);
 
-  const handleProject = useCallback(() => setStage("project"), []);
-  const handleAbout = useCallback(() => setStage("about"), []);
-  const handleSkills = useCallback(() => setStage("skills"), []);
-  const handleBack = useCallback(() => setStage("home"), []);
-  const handleTerminalOpen = useCallback(() => setStage("terminal"), []);
-  const handleClose = useCallback(() => setStage("project"), []);
+  const playWhoosh = useCallback(() => {
+    if (whooshRef.current) {
+      whooshRef.current.currentTime = 0;
+      whooshRef.current.play().catch(() => {});
+    }
+  }, []);
+
+  const handleProject = useCallback(() => { playWhoosh(); setStage("project"); }, [playWhoosh]);
+  const handleAbout = useCallback(() => { playWhoosh(); setStage("about"); }, [playWhoosh]);
+  const handleSkills = useCallback(() => { playWhoosh(); setStage("skills"); }, [playWhoosh]);
+  const handleBack = useCallback(() => { playWhoosh(); setStage("home"); }, [playWhoosh]);
+  const handleTerminalOpen = useCallback(() => { playWhoosh(); setStage("terminal"); }, [playWhoosh]);
+  const handleClose = useCallback(() => { playWhoosh(); setStage("project"); }, [playWhoosh]);
 
   const isHome = stage === "home";
   const isAbout = stage === "about";
@@ -353,6 +361,7 @@ export default function Home() {
       >
         <InteractiveTerminal ref={terminalRef} onClose={handleClose} />
       </div>
+      <audio ref={whooshRef} src="/whoosh.wav" preload="auto" />
     </main>
   );
 }
