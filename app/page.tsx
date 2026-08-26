@@ -43,10 +43,11 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         <img
           src={logoSrc}
           alt={`${skill} logo`}
-          className="absolute inset-0 w-full h-full object-cover rounded-xl"
+          className="absolute inset-0 w-full h-full object-contain p-2 rounded-xl"
           style={{
             opacity: hovered ? 1 : 0,
             transition: "opacity 0.3s ease",
+            background: "rgba(0,0,0,0.5)",
           }}
         />
       )}
