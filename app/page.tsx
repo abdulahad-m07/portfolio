@@ -63,7 +63,6 @@ export default function Home() {
   const [aboutVisible, setAboutVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const terminalRef = useRef<InteractiveTerminalHandle>(null);
-  const whooshRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 100);
@@ -78,10 +77,11 @@ export default function Home() {
   }, [stage]);
 
   const playWhoosh = useCallback(() => {
-    if (whooshRef.current) {
-      whooshRef.current.currentTime = 0;
-      whooshRef.current.play().catch(() => {});
-    }
+    try {
+      const audio = new Audio("/whoosh.mp3");
+      audio.volume = 1.0;
+      audio.play().catch(() => {});
+    } catch {}
   }, []);
 
   const handleProject = useCallback(() => { playWhoosh(); setStage("project"); }, [playWhoosh]);
@@ -361,7 +361,6 @@ export default function Home() {
       >
         <InteractiveTerminal ref={terminalRef} onClose={handleClose} />
       </div>
-      <audio ref={whooshRef} src="/whoosh.wav" preload="auto" />
     </main>
   );
 }
