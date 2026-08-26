@@ -15,7 +15,6 @@ type Stage = "home" | "project" | "terminal" | "about" | "skills";
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
-
   const isPython = skill === "Python";
 
   useEffect(() => {
@@ -30,12 +29,15 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
     setHovered(true);
     if (isPython && videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {});
     }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
+    if (isPython && videoRef.current) {
+      videoRef.current.pause();
+    }
   };
 
   return (
@@ -51,26 +53,28 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {isPython && (
+        <video
+          ref={videoRef}
+          muted
+          preload="auto"
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover rounded-xl"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.3s ease",
+          }}
+          src="/python-bg.mp4"
+        />
+      )}
       <div
         className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
         style={{
-          background: isPython && hovered ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.1)",
+          background: isPython && hovered ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
           transition: "background 0.3s ease",
         }}
       >
-        {isPython && (
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            className="w-full max-w-[60px] h-auto rounded border border-white/30 object-contain"
-            style={{
-              opacity: hovered ? 1 : 0,
-              transition: "opacity 0.3s ease",
-            }}
-            src="/python-bg.mp4"
-          />
-        )}
+        {isPython && <div className="w-8 h-8" />}
         <span className="relative z-10">{skill}</span>
       </div>
     </div>
