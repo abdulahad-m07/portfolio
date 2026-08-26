@@ -74,25 +74,25 @@ export default function Home() {
     <main className="relative h-screen w-full overflow-hidden">
       <MagicCursor fillColor="#ffffff" cursorSize={40} enableStretch />
 
-      {/* Cloud shader — fades out when leaving home */}
+      {/* Cloud shader — stays for project/terminal, fades only for about */}
       <div
         className="absolute inset-0"
         style={{
-          opacity: isHome ? 1 : 0,
+          opacity: isAbout ? 0 : 1,
           transition: `opacity 0.6s ${ease}`,
         }}
       >
         <CloudShaderDemo />
       </div>
 
-      {/* Nav buttons — fade up/down */}
+      {/* Nav buttons — fade up on about only */}
       <div
         className="absolute top-6 left-1/2 z-30 flex gap-4"
         style={{
-          transform: `translateX(-50%) translateY(${isHome ? 0 : -20}px)`,
-          opacity: isHome ? 1 : 0,
+          transform: `translateX(-50%) translateY(${isAbout ? -20 : 0}px)`,
+          opacity: isAbout ? 0 : 1,
           transition: `all 0.5s ${ease}`,
-          pointerEvents: isHome ? "auto" : "none",
+          pointerEvents: isAbout ? "none" : "auto",
         }}
       >
         <LiquidGlassButton label="About Me" onClick={handleAbout} {...glassBtnProps} />
