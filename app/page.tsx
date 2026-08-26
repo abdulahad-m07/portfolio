@@ -11,8 +11,9 @@ import MagicCursor from "@/components/ui/magic-cursor";
 import Image from "next/image";
 
 export default function Home() {
-  const [stage, setStage] = useState<"home" | "project" | "terminal">("home");
+  const [stage, setStage] = useState<"home" | "project" | "terminal" | "about">("home");
   const [entered, setEntered] = useState(false);
+  const [aboutVisible, setAboutVisible] = useState(false);
   const terminalRef = useRef<InteractiveTerminalHandle>(null);
 
   useEffect(() => {
@@ -20,8 +21,20 @@ export default function Home() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    if (stage === "about") {
+      requestAnimationFrame(() => setAboutVisible(true));
+    } else {
+      setAboutVisible(false);
+    }
+  }, [stage]);
+
   const handleProject = useCallback(() => {
     setStage("project");
+  }, []);
+
+  const handleAbout = useCallback(() => {
+    setStage("about");
   }, []);
 
   const handleBack = useCallback(() => {
@@ -36,10 +49,8 @@ export default function Home() {
     setStage("project");
   }, []);
 
-  const handleNav = useCallback((cmd: string) => {
-    setStage("terminal");
-    setTimeout(() => terminalRef.current?.runCommand(cmd), 800);
-  }, []);
+  const isHome = stage === "home";
+  const isAbout = stage === "about";
 
   const glassBtnProps = {
     padding: "10px 22px" as string,
@@ -57,23 +68,39 @@ export default function Home() {
     textColor: "rgba(255,255,255,0.9)",
   };
 
-  const handTransition = "all 0.7s cubic-bezier(0.22, 1, 0.36, 1)";
+  const ease = "cubic-bezier(0.22, 1, 0.36, 1)";
 
   return (
     <main className="relative h-screen w-full overflow-hidden">
       <MagicCursor fillColor="#ffffff" cursorSize={40} enableStretch />
-      <div className="absolute inset-0">
+
+      {/* Cloud shader — fades out when leaving home */}
+      <div
+        className="absolute inset-0"
+        style={{
+          opacity: isHome ? 1 : 0,
+          transition: `opacity 0.6s ${ease}`,
+        }}
+      >
         <CloudShaderDemo />
       </div>
 
-      {/* Nav buttons — top center */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex gap-4 nav-buttons-enter">
-        <LiquidGlassButton label="About Me" onClick={() => {}} {...glassBtnProps} />
+      {/* Nav buttons — fade up/down */}
+      <div
+        className="absolute top-6 left-1/2 z-30 flex gap-4"
+        style={{
+          transform: `translateX(-50%) translateY(${isHome ? 0 : -20}px)`,
+          opacity: isHome ? 1 : 0,
+          transition: `all 0.5s ${ease}`,
+          pointerEvents: isHome ? "auto" : "none",
+        }}
+      >
+        <LiquidGlassButton label="About Me" onClick={handleAbout} {...glassBtnProps} />
         <LiquidGlassButton label="Skills" onClick={() => {}} {...glassBtnProps} />
         <LiquidGlassButton label="Projects" onClick={handleProject} {...glassBtnProps} />
       </div>
 
-      {/* Left hand */}
+      {/* Left hand — slides back to left on about */}
       <Image
         src="/hand-left.png"
         alt="Left hand"
@@ -83,18 +110,20 @@ export default function Home() {
         style={{
           top: stage === "terminal" ? "85%" : "50%",
           transform: entered
-            ? "translateY(-50%) translateX(0)"
+            ? isAbout
+              ? "translateY(-50%) translateX(-100vw)"
+              : "translateY(-50%) translateX(0)"
             : "translateX(-100vw) translateY(-50%)",
           height: "125vh",
-          marginLeft: stage === "home" ? "-4rem" : "-3rem",
+          marginLeft: "-4rem",
           opacity: entered ? 1 : 0,
           filter: entered ? "blur(0)" : "blur(12px)",
-          transition: handTransition,
+          transition: `all 0.9s ${ease}`,
         }}
         priority
       />
 
-      {/* Right hand */}
+      {/* Right hand — slides back to right on about */}
       <Image
         src="/hand-right.png"
         alt="Right hand"
@@ -104,16 +133,18 @@ export default function Home() {
         style={{
           top: stage === "terminal" ? "15%" : "50%",
           transform: entered
-            ? stage === "terminal"
-              ? "translateY(-50%) translateX(-8rem) rotate(-17deg)"
-              : "translateY(-50%) translateX(0)"
+            ? isAbout
+              ? "translateY(-50%) translateX(100vw)"
+              : stage === "terminal"
+                ? "translateY(-50%) translateX(-8rem) rotate(-17deg)"
+                : "translateY(-50%) translateX(0)"
             : "translateX(100vw) translateY(-50%)",
           transformOrigin: stage === "terminal" ? "top right" : undefined,
           height: stage === "terminal" ? "135vh" : "125vh",
           marginRight: stage === "terminal" ? "-3rem" : stage === "project" ? "-3rem" : "-4rem",
           opacity: entered ? 1 : 0,
           filter: entered ? "blur(0)" : "blur(12px)",
-          transition: handTransition,
+          transition: `all 0.9s ${ease}`,
         }}
         priority
       />
@@ -121,7 +152,7 @@ export default function Home() {
       {/* Terminal button — center */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
         <div
-          className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`transition-all duration-700 ease-[${ease}] ${
             stage === "project"
               ? "opacity-100 translate-y-0 scale-100"
               : "opacity-0 translate-y-6 scale-90 pointer-events-none"
@@ -131,13 +162,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Back button */}
+      {/* Back button — shows on project OR about */}
       <div
-        className={`absolute top-6 left-6 z-30 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          stage === "project"
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-4 pointer-events-none"
-        }`}
+        className="absolute top-6 left-6 z-40"
+        style={{
+          opacity: stage === "project" || stage === "about" ? 1 : 0,
+          transform: `translateY(${stage === "project" || stage === "about" ? 0 : -16}px)`,
+          pointerEvents: stage === "project" || stage === "about" ? "auto" : "none",
+          transition: `all 0.5s ${ease}`,
+        }}
       >
         <LiquidGlassButton
           label="<"
@@ -158,15 +191,16 @@ export default function Home() {
         />
       </div>
 
-      {/* Name text — center between hands, home only */}
+      {/* Name text — fade out on about */}
       <div
         className="absolute left-0 right-0 top-1/2 z-15 text-center pointer-events-none"
         style={{
-          transform: stage === "home"
+          transform: isHome
             ? entered ? "translateY(-50%)" : "translateY(calc(-50% + 30px))"
-            : "translateY(calc(-50% + 10px))",
-          opacity: stage === "home" ? (entered ? 1 : 0) : 0,
-          transition: "all 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
+            : "translateY(calc(-50% + 40px))",
+          opacity: isHome ? (entered ? 1 : 0) : 0,
+          filter: isHome ? "blur(0)" : "blur(8px)",
+          transition: `all 0.6s ${ease}`,
         }}
       >
         <h1 className="text-white text-2xl md:text-4xl" style={{ fontFamily: "Absans, sans-serif", fontWeight: 400, letterSpacing: "-0.02em", lineHeight: 1.2 }}>
@@ -174,9 +208,68 @@ export default function Home() {
         </h1>
       </div>
 
+      {/* About Me — video background with slide-down + blur-in */}
+      <div
+        className="absolute inset-0 z-25"
+        style={{
+          transform: aboutVisible ? "translateY(0)" : "translateY(-100%)",
+          opacity: aboutVisible ? 1 : 0,
+          filter: aboutVisible ? "blur(0px)" : "blur(20px)",
+          transition: `all 0.9s ${ease}`,
+          pointerEvents: stage === "about" ? "auto" : "none",
+        }}
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/about-bg.mp4"
+        />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-8">
+          <h2
+            className="text-4xl md:text-6xl mb-8 text-white"
+            style={{
+              fontFamily: "Absans, sans-serif",
+              fontWeight: 400,
+              opacity: aboutVisible ? 1 : 0,
+              transform: aboutVisible ? "translateY(0)" : "translateY(30px)",
+              transition: `all 0.7s ${ease} 0.3s`,
+            }}
+          >
+            About Me
+          </h2>
+          <div
+            className="max-w-xl text-center space-y-5"
+            style={{
+              fontFamily: "Inter, sans-serif",
+              opacity: aboutVisible ? 1 : 0,
+              transform: aboutVisible ? "translateY(0)" : "translateY(30px)",
+              transition: `all 0.7s ${ease} 0.5s`,
+            }}
+          >
+            <p className="text-white/90 text-lg leading-relaxed">
+              B.E. AI &amp; Data Science — 2nd Year
+            </p>
+            <p className="text-white/70 text-sm leading-relaxed">
+              I&apos;m an AI &amp; Data Science student interested in
+              Data Analytics, Artificial Intelligence and Machine Learning.
+            </p>
+            <p className="text-white/60 text-sm">
+              Currently learning, building projects and improving my skills in AI &amp; Data Science.
+            </p>
+            <p className="text-white/50 text-xs tracking-widest uppercase">
+              Goal: Build useful real-world AI &amp; Data Science solutions.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Terminal — full screen overlay */}
       <div
-        className={`absolute inset-0 z-30 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-300 ${
+        className={`absolute inset-0 z-30 flex items-center justify-center transition-all duration-700 ease-[${ease}] delay-300 ${
           stage === "terminal"
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-12 pointer-events-none"
