@@ -14,6 +14,7 @@ type Stage = "home" | "project" | "terminal" | "about" | "skills";
 
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [hovered, setHovered] = useState(false);
 
   const isPython = skill === "Python";
 
@@ -25,6 +26,18 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
     return () => v.removeEventListener("ended", onEnd);
   }, [isPython]);
 
+  const handleMouseEnter = () => {
+    setHovered(true);
+    if (isPython && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
+
   return (
     <div
       className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm"
@@ -33,12 +46,16 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
         transition: `all 0.5s ${ease} ${0.6 + index * 0.08}s`,
+        aspectRatio: "1",
       }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div
-        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center gap-2 h-full min-h-[90px]"
+        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
         style={{
-          background: "rgba(255,255,255,0.1)",
+          background: isPython && hovered ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.1)",
+          transition: "background 0.3s ease",
         }}
       >
         {isPython && (
@@ -46,11 +63,11 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
             ref={videoRef}
             muted
             playsInline
-            onLoadedData={() => {
-              if (videoRef.current) videoRef.current.play();
+            className="w-full max-w-[60px] h-auto rounded border border-white/30 object-contain"
+            style={{
+              opacity: hovered ? 1 : 0,
+              transition: "opacity 0.3s ease",
             }}
-            className="w-10 h-auto rounded border border-white/30 object-contain"
-            style={{ aspectRatio: "16/9" }}
             src="/python-bg.mp4"
           />
         )}
