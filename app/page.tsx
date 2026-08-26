@@ -15,34 +15,30 @@ type Stage = "home" | "project" | "terminal" | "about" | "skills";
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
   const isPython = skill === "Python";
 
   useEffect(() => {
     if (!isPython || !videoRef.current) return;
     const v = videoRef.current;
-    const onEnd = () => { v.pause(); };
+    const onEnd = () => { v.pause(); setHasPlayed(true); };
     v.addEventListener("ended", onEnd);
     return () => v.removeEventListener("ended", onEnd);
   }, [isPython]);
 
   const handleMouseEnter = () => {
     setHovered(true);
-    if (isPython && videoRef.current) {
+    if (isPython && videoRef.current && !hasPlayed) {
       videoRef.current.currentTime = 0;
       videoRef.current.play().catch(() => {});
     }
   };
 
-  const handleMouseLeave = () => {
-    setHovered(false);
-    if (isPython && videoRef.current) {
-      videoRef.current.pause();
-    }
-  };
+  const showVideo = isPython && (hovered || hasPlayed);
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm"
+      className="relative overflow-hidden rounded-full text-center text-white/90 text-sm"
       style={{
         fontFamily: "Inter, sans-serif",
         opacity: visible ? 1 : 0,
@@ -51,7 +47,6 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         aspectRatio: "1",
       }}
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {isPython && (
         <video
@@ -59,18 +54,18 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
           muted
           preload="auto"
           playsInline
-          className="absolute inset-0 w-full h-full object-cover rounded-xl"
+          className="absolute inset-0 w-full h-full object-cover rounded-full"
           style={{
-            opacity: hovered ? 1 : 0,
+            opacity: showVideo ? 1 : 0,
             transition: "opacity 0.3s ease",
           }}
           src="/python-bg.mp4"
         />
       )}
       <div
-        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
+        className="relative backdrop-blur-md border border-white/20 rounded-full px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
         style={{
-          background: isPython && hovered ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+          background: showVideo ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
           transition: "background 0.3s ease",
         }}
       >
