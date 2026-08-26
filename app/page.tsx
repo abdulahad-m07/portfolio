@@ -10,10 +10,13 @@ import LiquidGlassButton from "@/components/ui/liquid-glass-button";
 import MagicCursor from "@/components/ui/magic-cursor";
 import Image from "next/image";
 
+type Stage = "home" | "project" | "terminal" | "about" | "skills";
+
 export default function Home() {
-  const [stage, setStage] = useState<"home" | "project" | "terminal" | "about">("home");
+  const [stage, setStage] = useState<Stage>("home");
   const [entered, setEntered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
+  const [skillsVisible, setSkillsVisible] = useState(false);
   const terminalRef = useRef<InteractiveTerminalHandle>(null);
 
   useEffect(() => {
@@ -22,35 +25,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (stage === "about") {
-      requestAnimationFrame(() => setAboutVisible(true));
-    } else {
-      setAboutVisible(false);
-    }
+    requestAnimationFrame(() => {
+      setAboutVisible(stage === "about");
+      setSkillsVisible(stage === "skills");
+    });
   }, [stage]);
 
-  const handleProject = useCallback(() => {
-    setStage("project");
-  }, []);
-
-  const handleAbout = useCallback(() => {
-    setStage("about");
-  }, []);
-
-  const handleBack = useCallback(() => {
-    setStage("home");
-  }, []);
-
-  const handleTerminalOpen = useCallback(() => {
-    setStage("terminal");
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setStage("project");
-  }, []);
+  const handleProject = useCallback(() => setStage("project"), []);
+  const handleAbout = useCallback(() => setStage("about"), []);
+  const handleSkills = useCallback(() => setStage("skills"), []);
+  const handleBack = useCallback(() => setStage("home"), []);
+  const handleTerminalOpen = useCallback(() => setStage("terminal"), []);
+  const handleClose = useCallback(() => setStage("project"), []);
 
   const isHome = stage === "home";
   const isAbout = stage === "about";
+  const isSkills = stage === "skills";
+  const isOverlay = isAbout || isSkills;
 
   const glassBtnProps = {
     padding: "10px 22px" as string,
@@ -74,33 +65,33 @@ export default function Home() {
     <main className="relative h-screen w-full overflow-hidden">
       <MagicCursor fillColor="#ffffff" cursorSize={40} enableStretch />
 
-      {/* Cloud shader — stays for project/terminal, fades only for about */}
+      {/* Cloud shader — fades only for about/skills */}
       <div
         className="absolute inset-0"
         style={{
-          opacity: isAbout ? 0 : 1,
+          opacity: isOverlay ? 0 : 1,
           transition: `opacity 0.6s ${ease}`,
         }}
       >
         <CloudShaderDemo />
       </div>
 
-      {/* Nav buttons — fade up on about only */}
+      {/* Nav buttons — fade on overlay pages */}
       <div
         className="absolute top-6 left-1/2 z-30 flex gap-4"
         style={{
-          transform: `translateX(-50%) translateY(${isAbout ? -20 : 0}px)`,
-          opacity: isAbout ? 0 : 1,
+          transform: `translateX(-50%) translateY(${isOverlay ? -20 : 0}px)`,
+          opacity: isOverlay ? 0 : 1,
           transition: `all 0.5s ${ease}`,
-          pointerEvents: isAbout ? "none" : "auto",
+          pointerEvents: isOverlay ? "none" : "auto",
         }}
       >
         <LiquidGlassButton label="About Me" onClick={handleAbout} {...glassBtnProps} />
-        <LiquidGlassButton label="Skills" onClick={() => {}} {...glassBtnProps} />
+        <LiquidGlassButton label="Skills" onClick={handleSkills} {...glassBtnProps} />
         <LiquidGlassButton label="Projects" onClick={handleProject} {...glassBtnProps} />
       </div>
 
-      {/* Left hand — slides back to left on about */}
+      {/* Left hand — slides out on overlay pages */}
       <Image
         src="/hand-left.png"
         alt="Left hand"
@@ -110,7 +101,7 @@ export default function Home() {
         style={{
           top: stage === "terminal" ? "85%" : "50%",
           transform: entered
-            ? isAbout
+            ? isOverlay
               ? "translateY(-50%) translateX(-100vw)"
               : "translateY(-50%) translateX(0)"
             : "translateX(-100vw) translateY(-50%)",
@@ -123,7 +114,7 @@ export default function Home() {
         priority
       />
 
-      {/* Right hand — slides back to right on about */}
+      {/* Right hand — slides out on overlay pages */}
       <Image
         src="/hand-right.png"
         alt="Right hand"
@@ -133,7 +124,7 @@ export default function Home() {
         style={{
           top: stage === "terminal" ? "15%" : "50%",
           transform: entered
-            ? isAbout
+            ? isOverlay
               ? "translateY(-50%) translateX(100vw)"
               : stage === "terminal"
                 ? "translateY(-50%) translateX(-8rem) rotate(-17deg)"
@@ -162,13 +153,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Back button — shows on project OR about */}
+      {/* Back button — shows on project/about/skills */}
       <div
         className="absolute top-6 left-6 z-40"
         style={{
-          opacity: stage === "project" || stage === "about" ? 1 : 0,
-          transform: `translateY(${stage === "project" || stage === "about" ? 0 : -16}px)`,
-          pointerEvents: stage === "project" || stage === "about" ? "auto" : "none",
+          opacity: isOverlay || stage === "project" ? 1 : 0,
+          transform: `translateY(${isOverlay || stage === "project" ? 0 : -16}px)`,
+          pointerEvents: isOverlay || stage === "project" ? "auto" : "none",
           transition: `all 0.5s ${ease}`,
         }}
       >
@@ -191,7 +182,7 @@ export default function Home() {
         />
       </div>
 
-      {/* Name text — fade out on about */}
+      {/* Name text — fade out on overlay pages */}
       <div
         className="absolute left-0 right-0 top-1/2 z-15 text-center pointer-events-none"
         style={{
@@ -208,7 +199,7 @@ export default function Home() {
         </h1>
       </div>
 
-      {/* About Me — video background with slide-down + blur-in */}
+      {/* About Me — video background */}
       <div
         className="absolute inset-0 z-25"
         style={{
@@ -219,14 +210,7 @@ export default function Home() {
           pointerEvents: stage === "about" ? "auto" : "none",
         }}
       >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/about-bg.mp4"
-        />
+        <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" src="/about-bg.mp4" />
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-8">
           <h2
@@ -250,9 +234,7 @@ export default function Home() {
               transition: `all 0.7s ${ease} 0.5s`,
             }}
           >
-            <p className="text-white/90 text-lg leading-relaxed">
-              B.E. AI &amp; Data Science — 2nd Year
-            </p>
+            <p className="text-white/90 text-lg leading-relaxed">B.E. AI &amp; Data Science — 2nd Year</p>
             <p className="text-white/70 text-sm leading-relaxed">
               I&apos;m an AI &amp; Data Science student interested in
               Data Analytics, Artificial Intelligence and Machine Learning.
@@ -263,6 +245,58 @@ export default function Home() {
             <p className="text-white/50 text-xs tracking-widest uppercase">
               Goal: Build useful real-world AI &amp; Data Science solutions.
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Skills — video background */}
+      <div
+        className="absolute inset-0 z-25"
+        style={{
+          transform: skillsVisible ? "translateY(0)" : "translateY(100%)",
+          opacity: skillsVisible ? 1 : 0,
+          filter: skillsVisible ? "blur(0px)" : "blur(20px)",
+          transition: `all 0.9s ${ease}`,
+          pointerEvents: stage === "skills" ? "auto" : "none",
+        }}
+      >
+        <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" src="/skills-bg.mp4" />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-8">
+          <h2
+            className="text-4xl md:text-6xl mb-10 text-white"
+            style={{
+              fontFamily: "Absans, sans-serif",
+              fontWeight: 400,
+              opacity: skillsVisible ? 1 : 0,
+              transform: skillsVisible ? "translateY(0)" : "translateY(30px)",
+              transition: `all 0.7s ${ease} 0.3s`,
+            }}
+          >
+            Skills
+          </h2>
+          <div
+            className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl"
+            style={{
+              opacity: skillsVisible ? 1 : 0,
+              transform: skillsVisible ? "translateY(0)" : "translateY(30px)",
+              transition: `all 0.7s ${ease} 0.5s`,
+            }}
+          >
+            {["Python", "SQL", "Excel", "Power BI", "Git", "GitHub"].map((skill, i) => (
+              <div
+                key={skill}
+                className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl px-5 py-3 text-center text-white/90 text-sm"
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  opacity: skillsVisible ? 1 : 0,
+                  transform: skillsVisible ? "translateY(0)" : "translateY(20px)",
+                  transition: `all 0.5s ${ease} ${0.6 + i * 0.08}s`,
+                }}
+              >
+                {skill}
+              </div>
+            ))}
           </div>
         </div>
       </div>
