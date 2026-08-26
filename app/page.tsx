@@ -12,6 +12,63 @@ import Image from "next/image";
 
 type Stage = "home" | "project" | "terminal" | "about" | "skills";
 
+function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hovered, setHovered] = useState(false);
+
+  const handleEnter = () => {
+    setHovered(true);
+    if (skill === "Python" && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+  };
+
+  const handleLeave = () => {
+    setHovered(false);
+  };
+
+  const isPython = skill === "Python";
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm"
+      style={{
+        fontFamily: "Inter, sans-serif",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
+        transition: `all 0.5s ${ease} ${0.6 + index * 0.08}s`,
+      }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {isPython && (
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.4s ease",
+            transform: hovered ? "scale(1)" : "scale(1.1)",
+          }}
+          src="/python-bg.mp4"
+        />
+      )}
+      <div
+        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3"
+        style={{
+          background: isPython && hovered ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.1)",
+          transition: "background 0.3s ease",
+        }}
+      >
+        <span className="relative z-10">{skill}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [stage, setStage] = useState<Stage>("home");
   const [entered, setEntered] = useState(false);
@@ -292,18 +349,7 @@ export default function Home() {
             }}
           >
             {["Python", "SQL", "Excel", "Power BI", "Git", "GitHub"].map((skill, i) => (
-              <div
-                key={skill}
-                className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl px-5 py-3 text-center text-white/90 text-sm"
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  opacity: skillsVisible ? 1 : 0,
-                  transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
-                  transition: `all 0.5s ${ease} ${0.6 + i * 0.08}s`,
-                }}
-              >
-                {skill}
-              </div>
+              <SkillCard key={skill} skill={skill} index={i} visible={skillsVisible} ease={ease} />
             ))}
           </div>
         </div>
