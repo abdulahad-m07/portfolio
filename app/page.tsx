@@ -13,6 +13,7 @@ import Image from "next/image";
 type Stage = "home" | "project" | "terminal" | "about" | "skills";
 
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
+  const [hovered, setHovered] = useState(false);
   const logos: Record<string, string> = {
     Python: "/python-logo.jpg",
     SQL: "/sql-logo.jpg",
@@ -25,7 +26,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm flex flex-col items-center justify-center gap-3 p-4"
+      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm"
       style={{
         fontFamily: "Inter, sans-serif",
         opacity: visible ? 1 : 0,
@@ -35,15 +36,23 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         background: "rgba(255,255,255,0.05)",
         border: "1px solid rgba(255,255,255,0.1)",
       }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {logoSrc && (
         <img
           src={logoSrc}
           alt={`${skill} logo`}
-          className="w-12 h-12 object-contain"
+          className="absolute inset-0 w-full h-full object-cover rounded-xl"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.3s ease",
+          }}
         />
       )}
-      <span className="relative z-10">{skill}</span>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="relative z-10">{skill}</span>
+      </div>
     </div>
   );
 }
