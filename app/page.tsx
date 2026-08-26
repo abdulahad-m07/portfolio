@@ -30,7 +30,6 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
   };
 
   const showVideo = !!videoSrc && hovered && !hasPlayed;
-  const showLogo = !!logoSrc && hasPlayed;
 
   return (
     <div
@@ -44,6 +43,17 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
       }}
       onMouseEnter={handleMouseEnter}
     >
+      {logoSrc && (
+        <img
+          src={logoSrc}
+          alt={`${skill} logo`}
+          className="absolute inset-0 w-full h-full object-cover rounded-full"
+          style={{
+            opacity: showVideo ? 0 : 1,
+            transition: "opacity 0.4s ease",
+          }}
+        />
+      )}
       {videoSrc && (
         <video
           ref={videoRef}
@@ -59,22 +69,11 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
           onEnded={() => setHasPlayed(true)}
         />
       )}
-      {showLogo && (
-        <img
-          src={logoSrc}
-          alt={`${skill} logo`}
-          className="absolute inset-0 w-full h-full object-cover rounded-full"
-          style={{
-            opacity: 1,
-            transition: "opacity 0.4s ease",
-          }}
-        />
-      )}
       <div
         className="relative border border-white/10 rounded-full px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
         style={{
-          background: (showVideo || showLogo) ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.05)",
-          backdropFilter: (showVideo || showLogo) ? "blur(0px)" : "blur(4px)",
+          background: (showVideo || logoSrc) ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.05)",
+          backdropFilter: (showVideo || logoSrc) ? "blur(0px)" : "blur(4px)",
           transition: "all 0.3s ease",
         }}
       >
