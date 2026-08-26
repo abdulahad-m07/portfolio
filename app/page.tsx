@@ -16,25 +16,26 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const isPython = skill === "Python";
+  const videoSkills: Record<string, string> = { Python: "/python-bg.mp4", SQL: "/sql-bg.mp4" };
+  const videoSrc = videoSkills[skill];
 
   useEffect(() => {
-    if (!isPython || !videoRef.current) return;
+    if (!videoSrc || !videoRef.current) return;
     const v = videoRef.current;
     const onEnd = () => { v.pause(); setHasPlayed(true); };
     v.addEventListener("ended", onEnd);
     return () => v.removeEventListener("ended", onEnd);
-  }, [isPython]);
+  }, [videoSrc]);
 
   const handleMouseEnter = () => {
     setHovered(true);
-    if (isPython && videoRef.current && !hasPlayed) {
+    if (videoSrc && videoRef.current && !hasPlayed) {
       videoRef.current.currentTime = 0;
       videoRef.current.play().catch(() => {});
     }
   };
 
-  const showVideo = isPython && (hovered || hasPlayed);
+  const showVideo = !!videoSrc && (hovered || hasPlayed);
 
   return (
     <div
@@ -48,7 +49,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
       }}
       onMouseEnter={handleMouseEnter}
     >
-      {isPython && (
+      {videoSrc && (
         <video
           ref={videoRef}
           muted
@@ -59,7 +60,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
             opacity: showVideo ? 1 : 0,
             transition: "opacity 0.3s ease",
           }}
-          src="/python-bg.mp4"
+          src={videoSrc}
         />
       )}
       <div
@@ -70,7 +71,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
           transition: "all 0.3s ease",
         }}
       >
-        {isPython && <div className="w-8 h-8" />}
+        {videoSrc && <div className="w-8 h-8" />}
         <span className="relative z-10">{skill}</span>
       </div>
     </div>
