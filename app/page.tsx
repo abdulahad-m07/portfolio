@@ -14,7 +14,6 @@ type Stage = "home" | "project" | "terminal" | "about" | "skills";
 
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoReady, setVideoReady] = useState(false);
 
   const isPython = skill === "Python";
 
@@ -37,27 +36,23 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
       }}
     >
       <div
-        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center gap-2"
+        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center gap-2 h-full min-h-[90px]"
         style={{
           background: "rgba(255,255,255,0.1)",
         }}
       >
         {isPython && (
-          <div className="w-10 h-10 rounded-full overflow-hidden border border-white/30">
-            <video
-              ref={videoRef}
-              muted
-              playsInline
-              onLoadedData={() => {
-                if (videoRef.current) {
-                  videoRef.current.play();
-                  setVideoReady(true);
-                }
-              }}
-              className="w-full h-full object-cover"
-              src="/python-bg.mp4"
-            />
-          </div>
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            onLoadedData={() => {
+              if (videoRef.current) videoRef.current.play();
+            }}
+            className="w-10 h-auto rounded border border-white/30 object-contain"
+            style={{ aspectRatio: "16/9" }}
+            src="/python-bg.mp4"
+          />
         )}
         <span className="relative z-10">{skill}</span>
       </div>
