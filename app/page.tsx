@@ -207,11 +207,11 @@ export default function Home() {
         </h1>
       </div>
 
-      {/* About Me — video background */}
+      {/* About Me — slides up from bottom */}
       <div
         className="absolute inset-0 z-25"
         style={{
-          transform: aboutVisible ? "translateY(0)" : "translateY(-100%)",
+          transform: aboutVisible ? "translateY(0)" : "translateY(100%)",
           opacity: aboutVisible ? 1 : 0,
           filter: aboutVisible ? "blur(0px)" : "blur(20px)",
           transition: `all 0.9s ${ease}`,
@@ -257,11 +257,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Skills — space whoosh transition from below */}
+      {/* Skills — slides down from top */}
       <div
         className="absolute inset-0 z-25"
         style={{
-          transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(60%) scale(1.4)",
+          transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(-100%) scale(1.4)",
           opacity: skillsVisible ? 1 : 0,
           filter: skillsVisible ? "blur(0px)" : "blur(30px)",
           transition: `transform 1.1s ${ease}, opacity 0.8s ${ease}, filter 0.9s ${ease}`,
