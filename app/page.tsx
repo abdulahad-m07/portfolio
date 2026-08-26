@@ -14,21 +14,17 @@ type Stage = "home" | "project" | "terminal" | "about" | "skills";
 
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hovered, setHovered] = useState(false);
-
-  const handleEnter = () => {
-    setHovered(true);
-    if (skill === "Python" && videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-    }
-  };
-
-  const handleLeave = () => {
-    setHovered(false);
-  };
+  const [videoReady, setVideoReady] = useState(false);
 
   const isPython = skill === "Python";
+
+  useEffect(() => {
+    if (!isPython || !videoRef.current) return;
+    const v = videoRef.current;
+    const onEnd = () => { v.pause(); };
+    v.addEventListener("ended", onEnd);
+    return () => v.removeEventListener("ended", onEnd);
+  }, [isPython]);
 
   return (
     <div
@@ -39,30 +35,30 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
         transition: `all 0.5s ${ease} ${0.6 + index * 0.08}s`,
       }}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
     >
-      {isPython && (
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            opacity: hovered ? 1 : 0,
-            transition: "opacity 0.4s ease",
-            transform: hovered ? "scale(1)" : "scale(1.1)",
-          }}
-          src="/python-bg.mp4"
-        />
-      )}
       <div
-        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3"
+        className="relative backdrop-blur-md border border-white/20 rounded-xl px-5 py-3 flex flex-col items-center gap-2"
         style={{
-          background: isPython && hovered ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.1)",
-          transition: "background 0.3s ease",
+          background: "rgba(255,255,255,0.1)",
         }}
       >
+        {isPython && (
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-white/30">
+            <video
+              ref={videoRef}
+              muted
+              playsInline
+              onLoadedData={() => {
+                if (videoRef.current) {
+                  videoRef.current.play();
+                  setVideoReady(true);
+                }
+              }}
+              className="w-full h-full object-cover"
+              src="/python-bg.mp4"
+            />
+          </div>
+        )}
         <span className="relative z-10">{skill}</span>
       </div>
     </div>
