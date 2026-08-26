@@ -63,9 +63,9 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         />
       )}
       <div
-        className="relative backdrop-blur-md border border-white/20 rounded-full px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
+        className="relative backdrop-blur-sm border border-white/10 rounded-full px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
         style={{
-          background: showVideo ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+          background: showVideo ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.05)",
           transition: "background 0.3s ease",
         }}
       >
