@@ -17,7 +17,9 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
   const [hovered, setHovered] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const videoSkills: Record<string, string> = { Python: "/python-bg.mp4", SQL: "/sql-bg.mp4" };
+  const logoSkills: Record<string, string> = { SQL: "/sql-logo.jpg" };
   const videoSrc = videoSkills[skill];
+  const logoSrc = logoSkills[skill];
 
   const handleMouseEnter = () => {
     setHovered(true);
@@ -27,7 +29,8 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
     }
   };
 
-  const showVideo = !!videoSrc && (hovered || hasPlayed);
+  const showVideo = !!videoSrc && hovered && !hasPlayed;
+  const showLogo = !!logoSrc && hasPlayed;
 
   return (
     <div
@@ -50,21 +53,32 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
           className="absolute inset-0 w-full h-full object-cover rounded-full"
           style={{
             opacity: showVideo ? 1 : 0,
-            transition: "opacity 0.3s ease",
+            transition: "opacity 0.4s ease",
           }}
           src={videoSrc}
           onEnded={() => setHasPlayed(true)}
         />
       )}
+      {showLogo && (
+        <img
+          src={logoSrc}
+          alt={`${skill} logo`}
+          className="absolute inset-0 w-full h-full object-cover rounded-full"
+          style={{
+            opacity: 1,
+            transition: "opacity 0.4s ease",
+          }}
+        />
+      )}
       <div
         className="relative border border-white/10 rounded-full px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
         style={{
-          background: showVideo ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.05)",
-          backdropFilter: showVideo ? "blur(0px)" : "blur(4px)",
+          background: (showVideo || showLogo) ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.05)",
+          backdropFilter: (showVideo || showLogo) ? "blur(0px)" : "blur(4px)",
           transition: "all 0.3s ease",
         }}
       >
-        {videoSrc && <div className="w-8 h-8" />}
+        {(videoSrc || logoSrc) && <div className="w-8 h-8" />}
         <span className="relative z-10">{skill}</span>
       </div>
     </div>
