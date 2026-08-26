@@ -65,12 +65,14 @@ export default function Home() {
     <main className="relative h-screen w-full overflow-hidden">
       <MagicCursor fillColor="#ffffff" cursorSize={40} enableStretch />
 
-      {/* Cloud shader — fades only for about/skills */}
+      {/* Cloud shader — zooms out + fades on overlay pages */}
       <div
         className="absolute inset-0"
         style={{
           opacity: isOverlay ? 0 : 1,
-          transition: `opacity 0.6s ${ease}`,
+          transform: isSkills ? "scale(2.5)" : "scale(1)",
+          filter: isSkills ? "blur(20px)" : "blur(0px)",
+          transition: `all 1s ${ease}`,
         }}
       >
         <CloudShaderDemo />
@@ -102,13 +104,15 @@ export default function Home() {
           top: stage === "terminal" ? "85%" : "50%",
           transform: entered
             ? isOverlay
-              ? "translateY(-50%) translateX(-100vw)"
+              ? isSkills
+                ? "translateY(-50%) translateX(-50vw) scale(1.5)"
+                : "translateY(-50%) translateX(-100vw)"
               : "translateY(-50%) translateX(0)"
             : "translateX(-100vw) translateY(-50%)",
           height: "125vh",
           marginLeft: "-4rem",
-          opacity: entered ? 1 : 0,
-          filter: entered ? "blur(0)" : "blur(12px)",
+          opacity: entered ? (isSkills ? 0 : 1) : 0,
+          filter: isSkills ? "blur(15px)" : entered ? "blur(0)" : "blur(12px)",
           transition: `all 0.9s ${ease}`,
         }}
         priority
@@ -125,7 +129,9 @@ export default function Home() {
           top: stage === "terminal" ? "15%" : "50%",
           transform: entered
             ? isOverlay
-              ? "translateY(-50%) translateX(100vw)"
+              ? isSkills
+                ? "translateY(-50%) translateX(50vw) scale(1.5)"
+                : "translateY(-50%) translateX(100vw)"
               : stage === "terminal"
                 ? "translateY(-50%) translateX(-8rem) rotate(-17deg)"
                 : "translateY(-50%) translateX(0)"
@@ -133,8 +139,8 @@ export default function Home() {
           transformOrigin: stage === "terminal" ? "top right" : undefined,
           height: stage === "terminal" ? "135vh" : "125vh",
           marginRight: stage === "terminal" ? "-3rem" : stage === "project" ? "-3rem" : "-4rem",
-          opacity: entered ? 1 : 0,
-          filter: entered ? "blur(0)" : "blur(12px)",
+          opacity: entered ? (isSkills ? 0 : 1) : 0,
+          filter: isSkills ? "blur(15px)" : entered ? "blur(0)" : "blur(12px)",
           transition: `all 0.9s ${ease}`,
         }}
         priority
@@ -182,16 +188,18 @@ export default function Home() {
         />
       </div>
 
-      {/* Name text — fade out on overlay pages */}
+      {/* Name text — zoom away on skills, fade on about */}
       <div
         className="absolute left-0 right-0 top-1/2 z-15 text-center pointer-events-none"
         style={{
           transform: isHome
-            ? entered ? "translateY(-50%)" : "translateY(calc(-50% + 30px))"
-            : "translateY(calc(-50% + 40px))",
+            ? entered ? "translateY(-50%) scale(1)" : "translateY(calc(-50% + 30px)) scale(1)"
+            : isSkills
+              ? "translateY(-50%) scale(3)"
+              : "translateY(calc(-50% + 40px)) scale(1)",
           opacity: isHome ? (entered ? 1 : 0) : 0,
-          filter: isHome ? "blur(0)" : "blur(8px)",
-          transition: `all 0.6s ${ease}`,
+          filter: isSkills ? "blur(20px)" : isHome ? "blur(0)" : "blur(8px)",
+          transition: `all 0.8s ${ease}`,
         }}
       >
         <h1 className="text-white text-2xl md:text-4xl" style={{ fontFamily: "Absans, sans-serif", fontWeight: 400, letterSpacing: "-0.02em", lineHeight: 1.2 }}>
@@ -249,14 +257,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Skills — video background */}
+      {/* Skills — space whoosh transition from below */}
       <div
         className="absolute inset-0 z-25"
         style={{
-          transform: skillsVisible ? "translateY(0)" : "translateY(100%)",
+          transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(60%) scale(1.4)",
           opacity: skillsVisible ? 1 : 0,
-          filter: skillsVisible ? "blur(0px)" : "blur(20px)",
-          transition: `all 0.9s ${ease}`,
+          filter: skillsVisible ? "blur(0px)" : "blur(30px)",
+          transition: `transform 1.1s ${ease}, opacity 0.8s ${ease}, filter 0.9s ${ease}`,
           pointerEvents: stage === "skills" ? "auto" : "none",
         }}
       >
@@ -269,8 +277,8 @@ export default function Home() {
               fontFamily: "Absans, sans-serif",
               fontWeight: 400,
               opacity: skillsVisible ? 1 : 0,
-              transform: skillsVisible ? "translateY(0)" : "translateY(30px)",
-              transition: `all 0.7s ${ease} 0.3s`,
+              transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(60px) scale(0.8)",
+              transition: `all 0.8s ${ease} 0.3s`,
             }}
           >
             Skills
@@ -279,7 +287,7 @@ export default function Home() {
             className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl"
             style={{
               opacity: skillsVisible ? 1 : 0,
-              transform: skillsVisible ? "translateY(0)" : "translateY(30px)",
+              transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.9)",
               transition: `all 0.7s ${ease} 0.5s`,
             }}
           >
@@ -290,7 +298,7 @@ export default function Home() {
                 style={{
                   fontFamily: "Inter, sans-serif",
                   opacity: skillsVisible ? 1 : 0,
-                  transform: skillsVisible ? "translateY(0)" : "translateY(20px)",
+                  transform: skillsVisible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
                   transition: `all 0.5s ${ease} ${0.6 + i * 0.08}s`,
                 }}
               >
