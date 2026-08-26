@@ -76,12 +76,20 @@ export default function Home() {
     });
   }, [stage]);
 
-  const handleProject = useCallback(() => setStage("project"), []);
-  const handleAbout = useCallback(() => setStage("about"), []);
-  const handleSkills = useCallback(() => setStage("skills"), []);
-  const handleBack = useCallback(() => setStage("home"), []);
-  const handleTerminalOpen = useCallback(() => setStage("terminal"), []);
-  const handleClose = useCallback(() => setStage("project"), []);
+  const playClick = useCallback(() => {
+    try {
+      const audio = new Audio("/click.mp3");
+      audio.volume = 0.8;
+      audio.play().catch(() => {});
+    } catch {}
+  }, []);
+
+  const handleProject = useCallback(() => { playClick(); setStage("project"); }, [playClick]);
+  const handleAbout = useCallback(() => { playClick(); setStage("about"); }, [playClick]);
+  const handleSkills = useCallback(() => { playClick(); setStage("skills"); }, [playClick]);
+  const handleBack = useCallback(() => { playClick(); setStage("home"); }, [playClick]);
+  const handleTerminalOpen = useCallback(() => { playClick(); setStage("terminal"); }, [playClick]);
+  const handleClose = useCallback(() => { playClick(); setStage("project"); }, [playClick]);
 
   const isHome = stage === "home";
   const isAbout = stage === "about";
