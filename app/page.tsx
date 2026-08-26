@@ -76,20 +76,12 @@ export default function Home() {
     });
   }, [stage]);
 
-  const playWhoosh = useCallback(() => {
-    try {
-      const audio = new Audio("/whoosh.mp3");
-      audio.volume = 1.0;
-      audio.play().catch(() => {});
-    } catch {}
-  }, []);
-
-  const handleProject = useCallback(() => { playWhoosh(); setStage("project"); }, [playWhoosh]);
-  const handleAbout = useCallback(() => { playWhoosh(); setStage("about"); }, [playWhoosh]);
-  const handleSkills = useCallback(() => { playWhoosh(); setStage("skills"); }, [playWhoosh]);
-  const handleBack = useCallback(() => { playWhoosh(); setStage("home"); }, [playWhoosh]);
-  const handleTerminalOpen = useCallback(() => { playWhoosh(); setStage("terminal"); }, [playWhoosh]);
-  const handleClose = useCallback(() => { playWhoosh(); setStage("project"); }, [playWhoosh]);
+  const handleProject = useCallback(() => setStage("project"), []);
+  const handleAbout = useCallback(() => setStage("about"), []);
+  const handleSkills = useCallback(() => setStage("skills"), []);
+  const handleBack = useCallback(() => setStage("home"), []);
+  const handleTerminalOpen = useCallback(() => setStage("terminal"), []);
+  const handleClose = useCallback(() => setStage("project"), []);
 
   const isHome = stage === "home";
   const isAbout = stage === "about";
