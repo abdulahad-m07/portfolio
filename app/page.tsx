@@ -13,73 +13,37 @@ import Image from "next/image";
 type Stage = "home" | "project" | "terminal" | "about" | "skills";
 
 function SkillCard({ skill, index, visible, ease }: { skill: string; index: number; visible: boolean; ease: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hovered, setHovered] = useState(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  const videoSkills: Record<string, string> = { Python: "/python-bg.mp4", SQL: "/sql-bg.mp4", Excel: "/excel-bg.mp4" };
-  const logoSkills: Record<string, string> = { SQL: "/sql-logo.jpg" };
-  const videoSrc = videoSkills[skill];
-  const logoSrc = logoSkills[skill];
-
-  const handleMouseEnter = () => {
-    setHovered(true);
-    if (videoSrc && videoRef.current && !hasPlayed) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
-    }
+  const logos: Record<string, string> = {
+    Python: "/python-logo.jpg",
+    SQL: "/sql-logo.jpg",
+    Excel: "/excel-logo.jpg",
+    "Power BI": "/powerbi-logo.jpg",
+    Git: "/git-logo.jpg",
+    GitHub: "/github-logo.jpg",
   };
-
-  const showVideo = !!videoSrc && hovered && !hasPlayed;
+  const logoSrc = logos[skill];
 
   return (
     <div
-      className="relative overflow-hidden rounded-full text-center text-white/90 text-sm"
+      className="relative overflow-hidden rounded-xl text-center text-white/90 text-sm flex flex-col items-center justify-center gap-3 p-4"
       style={{
         fontFamily: "Inter, sans-serif",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
         transition: `all 0.5s ${ease} ${0.6 + index * 0.08}s`,
         aspectRatio: "1",
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.1)",
       }}
-      onMouseEnter={handleMouseEnter}
     >
       {logoSrc && (
         <img
           src={logoSrc}
           alt={`${skill} logo`}
-          className="absolute inset-0 w-full h-full object-cover rounded-full"
-          style={{
-            opacity: showVideo ? 0 : 1,
-            transition: "opacity 0.4s ease",
-          }}
+          className="w-12 h-12 object-contain"
         />
       )}
-      {videoSrc && (
-        <video
-          ref={videoRef}
-          muted
-          preload="auto"
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover rounded-full"
-          style={{
-            opacity: showVideo ? 1 : 0,
-            transition: "opacity 0.4s ease",
-          }}
-          src={videoSrc}
-          onEnded={() => setHasPlayed(true)}
-        />
-      )}
-      <div
-        className="relative border border-white/10 rounded-full px-5 py-3 flex flex-col items-center justify-center gap-2 w-full h-full"
-        style={{
-          background: (showVideo || logoSrc) ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.05)",
-          backdropFilter: (showVideo || logoSrc) ? "blur(0px)" : "blur(4px)",
-          transition: "all 0.3s ease",
-        }}
-      >
-        {(videoSrc || logoSrc) && <div className="w-8 h-8" />}
-        <span className="relative z-10">{skill}</span>
-      </div>
+      <span className="relative z-10">{skill}</span>
     </div>
   );
 }
