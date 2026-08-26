@@ -19,14 +19,6 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
   const videoSkills: Record<string, string> = { Python: "/python-bg.mp4", SQL: "/sql-bg.mp4" };
   const videoSrc = videoSkills[skill];
 
-  useEffect(() => {
-    if (!videoSrc || !videoRef.current) return;
-    const v = videoRef.current;
-    const onEnd = () => { v.pause(); setHasPlayed(true); };
-    v.addEventListener("ended", onEnd);
-    return () => v.removeEventListener("ended", onEnd);
-  }, [videoSrc]);
-
   const handleMouseEnter = () => {
     setHovered(true);
     if (videoSrc && videoRef.current && !hasPlayed) {
@@ -61,6 +53,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
             transition: "opacity 0.3s ease",
           }}
           src={videoSrc}
+          onEnded={() => setHasPlayed(true)}
         />
       )}
       <div
