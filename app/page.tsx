@@ -16,7 +16,7 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const videoSkills: Record<string, string> = { Python: "/python-bg.mp4", SQL: "/sql-bg.mp4" };
+  const videoSkills: Record<string, string> = { Python: "/python-bg.mp4", SQL: "/sql-bg.mp4", Excel: "/excel-bg.mp4" };
   const logoSkills: Record<string, string> = { SQL: "/sql-logo.jpg" };
   const videoSrc = videoSkills[skill];
   const logoSrc = logoSkills[skill];
