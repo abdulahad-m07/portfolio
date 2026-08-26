@@ -32,7 +32,8 @@ function SkillCard({ skill, index, visible, ease }: { skill: string; index: numb
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.85)",
         transition: `all 0.5s ${ease} ${0.6 + index * 0.08}s`,
-        aspectRatio: "1",
+        width: "100%",
+        paddingBottom: "100%",
         background: "rgba(255,255,255,0.05)",
         border: "1px solid rgba(255,255,255,0.1)",
       }}
