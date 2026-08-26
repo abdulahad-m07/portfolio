@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import CloudShaderDemo from "@/components/cloud-shader-demo";
 import TerminalButton from "@/components/terminal-button";
 import InteractiveTerminal, {
@@ -76,13 +76,20 @@ export default function Home() {
     });
   }, [stage]);
 
-  const playClick = useCallback(() => {
-    try {
-      const audio = new Audio("/click.mp3");
-      audio.volume = 0.8;
-      audio.play().catch(() => {});
-    } catch {}
+  const clickAudio = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const a = new Audio("/click.mp3");
+    a.volume = 0.5;
+    a.preload = "auto";
+    return a;
   }, []);
+
+  const playClick = useCallback(() => {
+    if (clickAudio) {
+      clickAudio.currentTime = 0;
+      clickAudio.play().catch(() => {});
+    }
+  }, [clickAudio]);
 
   const handleProject = useCallback(() => { playClick(); setStage("project"); }, [playClick]);
   const handleAbout = useCallback(() => { playClick(); setStage("about"); }, [playClick]);
