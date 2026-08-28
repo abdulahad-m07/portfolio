@@ -8,6 +8,7 @@ import InteractiveTerminal, {
 } from "@/components/interactive-terminal";
 import LiquidGlassButton from "@/components/ui/liquid-glass-button";
 import MagicCursor from "@/components/ui/magic-cursor";
+import CampusFindPopup from "@/components/campusfind-popup";
 import Image from "next/image";
 
 type Stage = "home" | "project" | "terminal" | "about" | "skills";
@@ -62,6 +63,7 @@ export default function Home() {
   const [entered, setEntered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
+  const [campusPopup, setCampusPopup] = useState(false);
   const terminalRef = useRef<InteractiveTerminalHandle>(null);
 
   useEffect(() => {
@@ -82,6 +84,11 @@ export default function Home() {
   const handleBack = useCallback(() => { setStage("home"); }, []);
   const handleTerminalOpen = useCallback(() => { setStage("terminal"); }, []);
   const handleClose = useCallback(() => { setStage("project"); }, []);
+  const handleCampusFind = useCallback(() => { setCampusPopup(true); }, []);
+  const handlePopupRedirect = useCallback(() => {
+    setCampusPopup(false);
+    terminalRef.current?.clear();
+  }, []);
 
   const isHome = stage === "home";
   const isAbout = stage === "about";
@@ -351,8 +358,10 @@ export default function Home() {
             : "opacity-0 translate-y-12 pointer-events-none"
         }`}
       >
-        <InteractiveTerminal ref={terminalRef} onClose={handleClose} />
+        <InteractiveTerminal ref={terminalRef} onClose={handleClose} onCampusFind={handleCampusFind} />
       </div>
+
+      <CampusFindPopup open={campusPopup} onRedirected={handlePopupRedirect} />
     </main>
   );
 }

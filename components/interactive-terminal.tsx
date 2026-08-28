@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import InfoTip from "@/components/info-tip";
 
 let audioCtx: AudioContext | null = null;
 function getAudioCtx() {
@@ -77,7 +78,9 @@ const COMMANDS: Record<string, string[]> = {
     "Available commands:",
     "  about me  — who I am",
     "  skills    — my tech stack",
-    "  projects  — my work",
+    "  projects  — my work (incl. CampusFind)",
+    "  contribution in campusfind  — what I did on CampusFind",
+    "  open campusfind  — launch CampusFind",
     "  clear     — clear screen",
   ],
   "about me": [
@@ -100,6 +103,15 @@ const COMMANDS: Record<string, string[]> = {
   projects: [
     "• Personal Portfolio Website",
     "• Excel Anomaly Detection",
+    "• CampusFind — group project",
+    "  (colab with @shubham bhandare & @vedant lende)",
+    "  type: contribution in campusfind",
+  ],
+  "contribution in campusfind": [
+    "CampusFind — my contribution:",
+    "  I worked on the frontend & search/filter features",
+    "  for the campus exploration tool.",
+    "  (group project with @shubham bhandare & @vedant lende)",
   ],
   clear: ["__CLEAR__"],
 };
@@ -111,9 +123,10 @@ type TerminalLine = {
 
 export interface InteractiveTerminalHandle {
   runCommand: (cmd: string) => void;
+  clear: () => void;
 }
 
-export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => void }>(function InteractiveTerminal({ onClose }, ref) {
+export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => void; onCampusFind?: () => void }>(function InteractiveTerminal({ onClose, onCampusFind }, ref) {
   const [lines, setLines] = useState<TerminalLine[]>([
     { type: "output", content: "Type 'help' to see what I can do." },
     { type: "output", content: "" },
@@ -130,6 +143,12 @@ export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => voi
     runCommand: (cmd: string) => {
       setInput(cmd);
       setTimeout(() => handleCommand(cmd), 0);
+    },
+    clear: () => {
+      setLines([]);
+      setHistory([]);
+      setHistoryIdx(-1);
+      setInput("");
     },
   }));
 
@@ -170,7 +189,10 @@ export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => voi
       }
 
       const output = COMMANDS[key];
-      if (output) {
+      if (key === "open campusfind" || key === "campusfind") {
+        setLines((prev) => [...prev, promptLine, { type: "output", content: "opening campusfind..." }]);
+        onCampusFind?.();
+      } else if (output) {
         setLines((prev) => [
           ...prev,
           promptLine,
@@ -185,7 +207,7 @@ export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => voi
         ]);
       }
     },
-    [history, onClose],
+    [history, onClose, onCampusFind],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -234,6 +256,7 @@ export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => voi
     >
       <div className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/95 backdrop-blur shadow-2xl">
         <div className="flex items-center gap-2 bg-neutral-800 px-4 py-3">
+          <InfoTip />
           <div className="flex items-center gap-1.5">
             <button
               onClick={(e) => { e.stopPropagation(); onClose?.(); }}
