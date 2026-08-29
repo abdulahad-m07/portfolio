@@ -126,6 +126,35 @@ export interface InteractiveTerminalHandle {
   clear: () => void;
 }
 
+const SHUBHAM_LINK = "https://portfolio-red-tau-49.vercel.app/";
+
+function RenderOutput({ text }: { text: string }) {
+  const parts = text.split("@shubham bhandare");
+  if (parts.length === 1) {
+    return <span className="text-neutral-400">{text}</span>;
+  }
+  return (
+    <span className="text-neutral-400">
+      {parts.map((part, i) => (
+        <span key={i}>
+          {part}
+          {i < parts.length - 1 && (
+            <a
+              href={SHUBHAM_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="cursor-pointer text-sky-400 underline decoration-sky-400/50 underline-offset-2 hover:text-sky-300"
+            >
+              @shubham bhandare
+            </a>
+          )}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => void; onCampusFind?: () => void }>(function InteractiveTerminal({ onClose, onCampusFind }, ref) {
   const [lines, setLines] = useState<TerminalLine[]>([
     { type: "output", content: "Type 'help' to see what I can do." },
@@ -288,7 +317,7 @@ export default React.forwardRef<InteractiveTerminalHandle, { onClose?: () => voi
               ) : line.type === "error" ? (
                 <span className="text-red-400">{line.content}</span>
               ) : (
-                <span className="text-neutral-400">{line.content}</span>
+                <RenderOutput text={line.content} />
               )}
             </div>
           ))}
